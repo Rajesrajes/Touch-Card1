@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Glass Mirror Touch Card</title>
+  <style>
+    body {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #ff6ec4, #7873f5, #4adede, #f9ce34);
+      background-size: 400% 400%;
+      animation: gradientMove 10s ease infinite;
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      perspective: 1000px;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .card {
+      width: 320px;
+      height: 420px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #fff;
+      transform-style: preserve-3d;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(
+        circle at var(--x, 50%) var(--y, 50%),
+        rgba(255, 255, 255, 0.4),
+        transparent 60%
+      );
+      pointer-events: none;
+      transition: background 0.1s ease;
+    }
+
+    .card h2 {
+      font-size: 1.8rem;
+      margin: 0;
+    }
+
+    .card p {
+      margin-top: 10px;
+      font-size: 1rem;
+      opacity: 0.85;
+    }
+
+    .shine {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        120deg,
+        rgba(255, 255, 255, 0.3),
+        rgba(255, 255, 255, 0)
+      );
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="card" id="glassCard">
+    <div class="shine" id="shine"></div>
+    <h2>TOUCH ME</h2>
+    <!-- <p>Touch or move your mouse ✨</p> -->
+  </div>
+
+  <script>
+    const card = document.getElementById("glassCard");
+    const shine = document.getElementById("shine");
+
+    function handleMove(e) {
+      const rect = card.getBoundingClientRect();
+      const x = e.touches ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
+      const y = e.touches ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
+
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+
+      const rotateX = ((y - centerY) / centerY) * 10;
+      const rotateY = ((x - centerX) / centerX) * -10;
+
+      card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+      card.style.setProperty("--x", `${x}px`);
+      card.style.setProperty("--y", `${y}px`);
+
+      shine.style.opacity = 1;
+      shine.style.transform = `translate(${(x - centerX) / 10}px, ${(y - centerY) / 10}px) rotate(${rotateY}deg)`;
+    }
+
+    function resetCard() {
+      card.style.transform = "rotateX(0deg) rotateY(0deg)";
+      shine.style.opacity = 0;
+    }
+
+    card.addEventListener("mousemove", handleMove);
+    card.addEventListener("mouseleave", resetCard);
+    card.addEventListener("touchmove", handleMove);
+    card.addEventListener("touchend", resetCard);
+  </script>
+</body>
+</html>
